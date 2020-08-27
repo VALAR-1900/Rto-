@@ -1,0 +1,31 @@
+
+DELIMITER $$
+
+CREATE 
+	EVENT expired_license 
+	ON SCHEDULE AT CURRENT_TIMESTAMP
+	DO BEGIN
+        DELETE FROM license where DATEDIFF(CURDATE(), DATE_OF_ISSUE) > 3650;
+        END $$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE 
+	EVENT employee_age 
+	ON SCHEDULE AT CURRENT_TIMESTAMP
+	DO BEGIN
+        DELETE FROM employee where EID = (SELECT EID FROM employee_details INNER JOIN personal where employee_details.ID = personal.ID AND personal.AGE > 60);
+        END $$
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE 
+	EVENT license_pass
+	ON SCHEDULE AT CURRENT_TIMESTAMP
+	DO BEGIN
+        DELETE FROM applicant where A = "PASS" or A = "FAIL";
+        END $$
+DELIMITER ;

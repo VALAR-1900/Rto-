@@ -1,0 +1,35 @@
+CREATE OR REPLACE TRIGGER expired_license
+  BEFORE INSERT  
+  ON license
+  FOR EACH ROW
+DELETE FROM license WHERE LID = NEW.LID AND DATEDIFF(CURDATE(), DATE_OF_ISSUE) > 3650;
+
+CREATE OR REPLACE TRIGGER registration_verify
+   BEFORE INSERT 
+   ON registration
+   FOR EACH ROW 
+INSERT INTO EMAIL(ID) select registration.ID FROM registration WHERE registration.ID = NEW.ID; 
+  
+CREATE OR REPLACE TRIGGER rule_offender
+   AFTER INSERT
+   ON rules_contravened
+   FOR EACH ROW
+INSERT INTO EMAIL(ID) SELECT rules_contravened.ID FROM rules_contravened WHERE rules_contravened = NEW.ID;
+
+CREATE OR REPLACE TRIGGER license_notification
+   AFTER INSERT 
+   ON applicant 
+   FOR EACH ROW 
+INSERT INTO EMAIL(ID) SELECT applicant.ID FROM applicant WHERE applicant.ID = NEW.ID;
+
+DELIMITER //
+CREATE OR REPLACE TRIGGER license_pass_fail
+   AFTER UPDATE
+   ON applicant
+   FOR EACH ROW
+DELETE FROM applicant WHERE (ID = NEW.ID);
+END//
+DELIMITER ;
+
+   
+   
